@@ -1,0 +1,482 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.dash{background:#111;border-radius:16px;padding:28px;font-family:var(--font-sans)}
+.dash-header{margin-bottom:24px}
+.dash-title{font-size:22px;font-weight:500;color:#fff;margin-bottom:4px}
+.dash-sub{font-size:15px;color:#666}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:28px}
+.stat{background:#1a1a1a;border-radius:12px;padding:20px 18px}
+.stat-val{font-size:32px;font-weight:500;color:#fff;line-height:1;margin-bottom:6px}
+.stat-val.green{color:#4ade80}
+.stat-val.blue{color:#60a5fa}
+.stat-val.amber{color:#fbbf24}
+.stat-lbl{font-size:14px;color:#555}
+.filters{display:flex;gap:10px;margin-bottom:24px;flex-wrap:wrap}
+.filters select{background:#1a1a1a;border:1px solid #2a2a2a;color:#ccc;font-size:14px;padding:10px 14px;border-radius:10px;appearance:none;cursor:pointer;font-family:var(--font-sans)}
+.filters select:focus{outline:none;border-color:#444}
+.goal-group{margin-bottom:28px}
+.group-label{font-size:12px;font-weight:500;color:#444;text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #1e1e1e}
+.goal-card{background:#1a1a1a;border-radius:12px;padding:20px;margin-bottom:8px;cursor:pointer;border:1px solid #222;transition:border-color .15s}
+.goal-card:hover{border-color:#333}
+.goal-card.open{border-color:#333}
+.gc-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}
+.gc-text{font-size:15px;color:#ddd;line-height:1.5;flex:1}
+.pill{font-size:12px;font-weight:500;padding:4px 12px;border-radius:20px;white-space:nowrap;flex-shrink:0}
+.pill-blank{background:#222;color:#555}
+.pill-ontrack{background:#052e16;color:#4ade80}
+.pill-atrisk{background:#2d1a02;color:#fbbf24}
+.pill-completed{background:#042f2e;color:#2dd4bf}
+.pill-missed{background:#2d0505;color:#f87171}
+.pill-deferred{background:#1e1b4b;color:#a5b4fc}
+.gc-meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.tag{font-size:12px;padding:4px 10px;border-radius:6px;background:#222;color:#666}
+.tag.bu{color:#888}
+.tag.stretch{background:#1a1500;color:#ca8a04}
+.tag.main{background:#0f1f0f;color:#4ade80}
+.tag.q1{background:#0d1f2d;color:#60a5fa}
+.tag.q2{background:#1a0f2d;color:#a78bfa}
+.tag.q3{background:#2d1200;color:#fb923c}
+.tag.q4{background:#0d2219;color:#34d399}
+.prog-row{display:flex;align-items:center;gap:12px}
+.prog-track{flex:1;height:6px;background:#222;border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;border-radius:3px;transition:width .3s}
+.prog-pct{font-size:14px;color:#555;min-width:36px;text-align:right}
+.gc-expand{display:none;margin-top:18px;padding-top:18px;border-top:1px solid #222}
+.goal-card.open .gc-expand{display:block}
+.expand-row{display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.expand-lbl{font-size:13px;color:#555}
+.expand-row input[type=range]{flex:1;min-width:120px;max-width:200px;accent-color:#4ade80}
+.expand-pct{font-size:14px;font-weight:500;color:#ccc;min-width:36px}
+.expand-row select{background:#222;border:1px solid #333;color:#ccc;font-size:13px;padding:8px 12px;border-radius:8px;font-family:var(--font-sans)}
+.owner-info{font-size:13px;color:#555;margin-top:8px}
+.owner-info span{color:#777;margin-right:16px}
+.empty{text-align:center;padding:40px;color:#444;font-size:16px}
+.upload-box{background:#1a1a1a;border:1px dashed #2a2a2a;border-radius:12px;padding:32px;text-align:center;margin-bottom:20px}
+.upload-box p{font-size:15px;color:#555;margin-bottom:16px}
+.upload-btn-label{display:inline-block;background:#222;border:1px solid #333;color:#aaa;font-size:14px;padding:10px 20px;border-radius:10px;cursor:pointer;font-family:var(--font-sans)}
+.upload-btn-label:hover{background:#2a2a2a;color:#ddd}
+.tab-row{display:flex;gap:0;margin-bottom:24px;border-bottom:1px solid #1e1e1e}
+.tab-btn{background:none;border:none;border-bottom:2px solid transparent;font-size:15px;font-weight:500;color:#555;padding:10px 18px 12px;cursor:pointer;font-family:var(--font-sans);margin-bottom:-1px}
+.tab-btn.active{color:#fff;border-bottom-color:#fff}
+.result-count{font-size:13px;color:#444;margin-left:auto;align-self:center}
+
+.action-row{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+.primary-btn,.secondary-btn,.danger-btn{border:1px solid #333;border-radius:10px;padding:10px 14px;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--font-sans)}
+.primary-btn{background:#4ade80;color:#07130b;border-color:#4ade80}
+.secondary-btn{background:#222;color:#ddd}
+.danger-btn{background:#2d0505;color:#f87171;border-color:#4a1111}
+.card-actions{display:flex;gap:8px;align-items:center;flex-shrink:0}
+.icon-btn{background:#222;border:1px solid #333;color:#aaa;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer;font-family:var(--font-sans)}
+.icon-btn:hover{background:#2a2a2a;color:#fff}
+.form-panel{background:#1a1a1a;border:1px solid #222;border-radius:14px;padding:20px;margin-bottom:18px}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.form-field.full{grid-column:1/-1}
+.form-field label{display:block;font-size:12px;color:#666;text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px}
+.form-field input,.form-field select,.form-field textarea{width:100%;background:#111;border:1px solid #2a2a2a;color:#ddd;border-radius:10px;padding:11px 12px;font-size:14px;font-family:var(--font-sans)}
+.form-field textarea{min-height:92px;resize:vertical;line-height:1.4}
+.form-actions{display:flex;gap:10px;align-items:center;justify-content:flex-end;margin-top:16px;flex-wrap:wrap}
+.form-note{font-size:13px;color:#555;margin-right:auto}
+@media(max-width:620px){.form-grid{grid-template-columns:1fr}.gc-top{flex-direction:column}.card-actions{width:100%;justify-content:space-between}}
+
+</style>
+
+<div class="dash">
+<h2 class="sr-only">CDP FY27 goals dashboard — interactive tracker with filters and progress tracking</h2>
+
+<div class="dash-header">
+  <div class="dash-title">CDP Goals Dashboard</div>
+  <div class="dash-sub" id="dashSub">FY27 · Loading…</div>
+</div>
+
+<div class="stats" id="statsGrid"></div>
+
+<div class="tab-row">
+  <button class="tab-btn active" onclick="showTab('goals',this)">Goals</button>
+  <button class="tab-btn" onclick="showTab('manage',this);startAddGoal()">Add / edit goal</button>
+  <button class="tab-btn" onclick="showTab('upload',this)">Upload year</button>
+</div>
+
+<div id="pane-goals">
+  <div class="action-row"><button class="primary-btn" onclick="showTab('manage',document.querySelectorAll('.tab-btn')[1]);startAddGoal()">+ Add goal</button><span class="form-note">Click a goal to update progress/status, or use Edit to change details.</span></div>
+  <div class="filters">
+    <select id="fBU" onchange="render()"><option value="">All BUs</option></select>
+    <select id="fObj" onchange="render()"><option value="">All objectives</option></select>
+    <select id="fType" onchange="render()">
+      <option value="">Main + Stretch</option>
+      <option value="Main">Main only</option>
+      <option value="Stretch">Stretch only</option>
+    </select>
+    <select id="fQ" onchange="render()">
+      <option value="">All quarters</option>
+      <option value="Q1">Q1</option>
+      <option value="Q2">Q2</option>
+      <option value="Q3">Q3</option>
+      <option value="Q4">Q4</option>
+    </select>
+    <span class="result-count" id="resultCount"></span>
+  </div>
+  <div id="goalsPane"></div>
+</div>
+
+
+<div id="pane-manage" style="display:none">
+  <div class="form-panel">
+    <div class="dash-title" id="goalFormTitle" style="font-size:18px;margin-bottom:14px">Add Goal</div>
+    <form id="goalForm" onsubmit="saveGoal(event)">
+      <input type="hidden" id="goalId">
+      <div class="form-grid">
+        <div class="form-field"><label for="goalBU">BU</label><input id="goalBU" list="buList" required placeholder="e.g., QVS"></div>
+        <div class="form-field"><label for="goalObj">Objective</label><input id="goalObj" list="objList" required placeholder="e.g., Strategic Focus"></div>
+        <div class="form-field full"><label for="goalM">Goal</label><textarea id="goalM" required placeholder="Describe the goal and measurable outcome"></textarea></div>
+        <div class="form-field"><label for="goalType">Type</label><select id="goalType"><option>Main</option><option>Stretch</option></select></div>
+        <div class="form-field"><label for="goalDue">Due</label><select id="goalDue"><option>Q1 FY27</option><option>Q2 FY27</option><option>Q3 FY27</option><option selected>Q4 FY27</option></select></div>
+        <div class="form-field"><label for="goalOwner">Owner</label><input id="goalOwner" placeholder="Owner name"></div>
+        <div class="form-field"><label for="goalProgress">Progress %</label><input id="goalProgress" type="number" min="0" max="100" step="5" value="0"></div>
+        <div class="form-field"><label for="goalStatus">Status</label><select id="goalStatus"><option value="">Not started</option><option>On Track</option><option>At Risk</option><option>Completed</option><option>Deferred</option><option>Missed</option><option>Cancelled</option></select></div>
+      </div>
+      <div class="form-actions">
+        <span class="form-note" id="formMsg">New goals are added to the current dashboard session.</span>
+        <button type="button" class="danger-btn" id="deleteGoalBtn" onclick="deleteGoal()" style="display:none">Delete</button>
+        <button type="button" class="secondary-btn" onclick="clearGoalForm()">Clear</button>
+        <button type="submit" class="primary-btn">Save goal</button>
+      </div>
+    </form>
+    <datalist id="buList"></datalist>
+    <datalist id="objList"></datalist>
+  </div>
+</div>
+
+<div id="pane-upload" style="display:none">
+  <div class="upload-box">
+    <p>Upload a goals tracker (.xlsx or .csv) for a new fiscal year</p>
+    <label class="upload-btn-label" for="fileIn">
+      <i class="ti ti-upload" aria-hidden="true"></i> Choose file
+    </label>
+    <input type="file" id="fileIn" accept=".xlsx,.csv" style="display:none" onchange="handleFile(event)">
+    <p id="uploadMsg" style="margin-top:14px;font-size:13px;color:#4ade80"></p>
+  </div>
+  <div style="font-size:13px;color:#444" id="uploadedList">No additional years uploaded.</div>
+</div>
+</div>
+
+<script>
+const G = [
+  {bu:"QVS",obj:"Strategic Focus",m:"Achieve FY27 cost savings of $20M across technology and location optimization",type:"Main",due:"Q4 FY27",owner:"Lorena",p:0,s:""},
+  {bu:"QVS",obj:"Strategic Focus",m:"[Stretch] $25M cost savings in FY27",type:"Stretch",due:"Q4 FY27",owner:"Lorena",p:0,s:""},
+  {bu:"LOCALIZATION",obj:"Strategic Focus",m:"Deliver FY28 plan accuracy within ±2% excluding demand changes",type:"Main",due:"Q4 FY27",owner:"Alessandro",p:0,s:""},
+  {bu:"LOCALIZATION",obj:"Strategic Focus",m:"Deliver committed efficiency in FY27: $2.5M; reduce Loc OpEx for FY28",type:"Main",due:"Q4 FY27",owner:"Alessandro",p:0,s:""},
+  {bu:"LOCALIZATION",obj:"Strategic Focus",m:"Accuracy of P&L (amount and timing); all OpEx variances justified",type:"Main",due:"Q4 FY27",owner:"Alessandro",p:0,s:""},
+  {bu:"LOCALIZATION",obj:"Strategic Focus",m:"Cost and revenue drivers visible to stakeholders",type:"Main",due:"Q4 FY27",owner:"Alessandro",p:0,s:""},
+  {bu:"CREATE",obj:"Strategic Focus",m:"Rate alignment and transparency aligned with company goal",type:"Main",due:"Q4 FY27",owner:"Gen",p:0,s:""},
+  {bu:"CREATE",obj:"Strategic Focus",m:"Efficiency target goals (30% by FY28) — meet FY27 targets",type:"Main",due:"Q4 FY27",owner:"Gen",p:0,s:""},
+  {bu:"AI TRANSFORMATION",obj:"Industry Leading Innovation",m:"Deliver MVP Authenticity Engine modeling real-world events vs in-game outcomes for 3+ Sports dimensions",type:"Main",due:"Q3 FY27",owner:"Kraig",p:0,s:""},
+  {bu:"AI TRANSFORMATION",obj:"Industry Leading Innovation",m:"Increase testing coverage in Madden and FC by 40%+, delivering $0.3M+ cost avoidance",type:"Main",due:"Q4 FY27",owner:"Kraig",p:0,s:""},
+  {bu:"AI TRANSFORMATION",obj:"Industry Leading Innovation",m:"Design and build scalable co-pilot platform with 5+ use cases reducing cycle time",type:"Main",due:"Q2 FY27",owner:"Farah",p:0,s:""},
+  {bu:"AI TRANSFORMATION",obj:"Industry Leading Innovation",m:"Achieve 20%+ reduction in effort or cycle time for 2+ pilot workflows",type:"Main",due:"Q4 FY27",owner:"Farah",p:0,s:""},
+  {bu:"AI TRANSFORMATION",obj:"Industry Leading Innovation",m:"[Stretch] 20%+ activation rates for 2 priority use cases",type:"Stretch",due:"Q4 FY27",owner:"Farah",p:0,s:""},
+  {bu:"AI TRANSFORMATION",obj:"Industry Leading Innovation",m:"Deliver business case and technical design for agentic testing platform",type:"Main",due:"Q1 FY27",owner:"Farah",p:0,s:""},
+  {bu:"AI TRANSFORMATION",obj:"Industry Leading Innovation",m:"AI-Native ARPG game development strategy validated with CDP leadership",type:"Main",due:"Q3 FY27",owner:"Farah",p:0,s:""},
+  {bu:"AI TRANSFORMATION",obj:"Create the Workforce of the Future",m:"Stand up CDP AI hub with persona-based training paths for key job families",type:"Main",due:"Q2 FY27",owner:"Farah",p:0,s:""},
+  {bu:"AI TRANSFORMATION",obj:"Create the Workforce of the Future",m:"75%+ of employees complete at least one role-specific AI training",type:"Main",due:"Q4 FY27",owner:"Farah",p:0,s:""},
+  {bu:"AI TRANSFORMATION",obj:"Create the Workforce of the Future",m:"[Stretch] 85%+ AI training completion",type:"Stretch",due:"Q4 FY27",owner:"Farah",p:0,s:""},
+  {bu:"AI TRANSFORMATION",obj:"Create the Workforce of the Future",m:"70%+ activation for GitHub Copilot; 55%+ adoption rate",type:"Main",due:"Q4 FY27",owner:"Farah",p:0,s:""},
+  {bu:"AI TRANSFORMATION",obj:"Create the Workforce of the Future",m:"60%+ activation for ChatGPT Enterprise; 40%+ adoption",type:"Main",due:"Q4 FY27",owner:"Farah",p:0,s:""},
+  {bu:"AI TRANSFORMATION",obj:"Create the Workforce of the Future",m:"Identify and implement 4+ AI-enabled use cases with measurable improvement",type:"Main",due:"Q4 FY27",owner:"Farah",p:0,s:""},
+  {bu:"QVS",obj:"Industry Leading Innovation",m:"Establish baseline and measurement system for Zero Manual Functional Test",type:"Main",due:"Q1 FY27",owner:"Lorena",p:0,s:""},
+  {bu:"QVS",obj:"Industry Leading Innovation",m:"Accelerate elimination via targeted investment decision in Q2",type:"Main",due:"Q2 FY27",owner:"Lorena",p:0,s:""},
+  {bu:"QVS",obj:"Industry Leading Innovation",m:"Drive 5% reduction of Manual Functional Testing",type:"Main",due:"Q4 FY27",owner:"Lorena",p:0,s:""},
+  {bu:"QVS",obj:"Industry Leading Innovation",m:"[Stretch] Drive 10% reduction of Manual Functional Testing",type:"Stretch",due:"Q4 FY27",owner:"Lorena",p:0,s:""},
+  {bu:"QVS",obj:"Industry Leading Innovation",m:"Expand AutoPlayers adoption to Tailgate — $1.5M cost avoidance",type:"Main",due:"Q4 FY27",owner:"Derek",p:0,s:""},
+  {bu:"QVS",obj:"Industry Leading Innovation",m:"Stellarator MVP in Jedi (R11) — $600K productivity gains",type:"Main",due:"Q4 FY27",owner:"Derek",p:0,s:""},
+  {bu:"QVS",obj:"Industry Leading Innovation",m:"Tardis 2.0 running on 4+ titles — $700K cost avoidance in FY27",type:"Main",due:"Q4 FY27",owner:"Kraig",p:0,s:""},
+  {bu:"QVS",obj:"Quality",m:"Scale Kaldor economy validation — $15–18M revenue protection across Sports titles",type:"Main",due:"Q4 FY27",owner:"Kraig",p:0,s:""},
+  {bu:"QVS",obj:"Quality",m:"Deliver MVP Authenticity Engine for Madden and FC — $490K cost avoidance",type:"Main",due:"Q3 FY27",owner:"Kraig",p:0,s:""},
+  {bu:"QVS",obj:"Quality",m:"Deliver $600K–$660K impact via improved debugging workflows (Nexus)",type:"Main",due:"Q4 FY27",owner:"Derek",p:0,s:""},
+  {bu:"QVS",obj:"Quality",m:"BF6: Sustain 65%+ weekly retention; maintain NPS+ (34); Steam Mostly Positive in Q2",type:"Main",due:"Q4 FY27",owner:"Derek",p:0,s:""},
+  {bu:"QVS",obj:"Quality",m:"F1: 2026 Season DLC — Metacritic >80; Franchise sentiment avg above 7.0 for FY27",type:"Main",due:"Q4 FY27",owner:"Kraig",p:0,s:""},
+  {bu:"QVS",obj:"Quality",m:"Sims TSE launch — no escaped P0/P1 issues; weekly Quality Compass heatmap",type:"Main",due:"Q4 FY27",owner:"Derek",p:0,s:""},
+  {bu:"QVS",obj:"Quality",m:"Skate: Reduce manual MTBF by 80% by Q2; increase automation 30% by Q2",type:"Main",due:"Q2 FY27",owner:"Kraig",p:0,s:""},
+  {bu:"QVS",obj:"Quality",m:"FC PC: achieve Mostly Positive Steam reviews; prototype player journey insights",type:"Main",due:"Q3 FY27",owner:"Kraig",p:0,s:""},
+  {bu:"QVS",obj:"Quality",m:"FC Online: improve live sentiment to 5.0+ by Q2; reduce live defects 10%",type:"Main",due:"Q4 FY27",owner:"Kraig",p:0,s:""},
+  {bu:"QVS",obj:"World Class Partnership",m:"Launchline: 90% of actionable player issues filtered to game team (NHL/UFC April 2026)",type:"Main",due:"Q2 FY27",owner:"Kraig",p:0,s:""},
+  {bu:"QVS",obj:"World Class Partnership",m:"Improve Fan Sentiment Score 5–10%+ across all Sports products",type:"Main",due:"Q4 FY27",owner:"Kraig",p:0,s:""},
+  {bu:"QVS",obj:"World Class Partnership",m:"Implement Quality Partnership Score — twice-per-year executive panel measurement",type:"Main",due:"Q4 FY27",owner:"Lorena",p:0,s:""},
+  {bu:"QVS",obj:"Grow EA's Reach",m:"Geo Expansion — 20–40% player base growth in China across FC, BF, Apex, Hopper",type:"Main",due:"Q4 FY27",owner:"Derek",p:0,s:""},
+  {bu:"QVS",obj:"Grow EA's Reach",m:"Japan: 5–15% player growth for Apex; PC standards adoption across FY27 titles",type:"Main",due:"Q4 FY27",owner:"Derek",p:0,s:""},
+  {bu:"CREATE",obj:"Industry Leading Innovation",m:"Rapid World Creation — 80% reduction in time-to-asset for simple props",type:"Main",due:"Q4 FY27",owner:"Gen",p:0,s:""},
+  {bu:"CREATE",obj:"Industry Leading Innovation",m:"Zero Touch Mocap — end-to-end automated markerless pipeline, weeks to days",type:"Main",due:"Q4 FY27",owner:"Gen",p:0,s:""},
+  {bu:"CREATE",obj:"Industry Leading Innovation",m:"Rapid Storytelling Visualization — 50% reduction in time-to-visual for 1+ pilot",type:"Main",due:"Q4 FY27",owner:"John",p:0,s:""},
+  {bu:"CREATE",obj:"Industry Leading Innovation",m:"Automated AI asset validation in FC — reduce manual creator testing 50%+",type:"Main",due:"Q4 FY27",owner:"Gen",p:0,s:""},
+  {bu:"CREATE",obj:"Industry Leading Innovation",m:"AutoSkin on Apex — automate skinning process integrated by Q4",type:"Main",due:"Q4 FY27",owner:"Gen",p:0,s:""},
+  {bu:"CREATE",obj:"Quality",m:"Achieve 15% efficiency improvement in BF level creation by Q4 FY27",type:"Main",due:"Q4 FY27",owner:"Gen",p:0,s:""},
+  {bu:"CREATE",obj:"Quality",m:"Deliver 3 maps with 3 Pods without compromising quality",type:"Main",due:"Q4 FY27",owner:"Gen",p:0,s:""},
+  {bu:"CREATE",obj:"Quality",m:"[Stretch] Deliver 5 maps with 5 Pods including 1 Pod of Virtuos",type:"Stretch",due:"Q4 FY27",owner:"Gen",p:0,s:""},
+  {bu:"CREATE",obj:"Quality",m:"Achieve 15% efficiency gain in markerless capture workflows across 3+ products",type:"Main",due:"Q4 FY27",owner:"Gen",p:0,s:""},
+  {bu:"CREATE",obj:"World Class Partnership",m:"Partnership Satisfaction Scores at 4.5/5.0",type:"Main",due:"Q4 FY27",owner:"Gen",p:0,s:""},
+  {bu:"CREATE",obj:"World Class Partnership",m:"Update 5-year planning with BF and FC; expand long-range planning with Sims",type:"Main",due:"Q4 FY27",owner:"Marc",p:0,s:""},
+  {bu:"CREATE",obj:"Grow EA's Reach",m:"Develop and present culturalization pitch; get approval on 1 initiative",type:"Main",due:"Q4 FY27",owner:"Marc",p:0,s:""},
+  {bu:"CREATE",obj:"Grow EA's Reach",m:"Operationalize culturization initiative with Create + LOC workflows",type:"Main",due:"Q4 FY27",owner:"Marc",p:0,s:""},
+  {bu:"CREATE",obj:"Create the Workforce of the Future",m:"Identify key roles for succession by Q2; successor and development plan by Q3",type:"Main",due:"Q3 FY27",owner:"Gen",p:0,s:""},
+  {bu:"LOCALIZATION",obj:"Industry Leading Innovation",m:"Zero Manual Translation — $900K reduction in Translation CS in FY27",type:"Main",due:"Q4 FY27",owner:"Alessandro",p:0,s:""},
+  {bu:"LOCALIZATION",obj:"Industry Leading Innovation",m:"5 new languages delivered absorbing cost through efficiencies",type:"Main",due:"Q4 FY27",owner:"Alessandro",p:0,s:""},
+  {bu:"LOCALIZATION",obj:"Industry Leading Innovation",m:"Loc Technology drives $1M efficiencies across EA partner adoption",type:"Main",due:"Q4 FY27",owner:"Alessandro",p:0,s:""},
+  {bu:"LOCALIZATION",obj:"Industry Leading Innovation",m:"Increase market coverage without increasing baseline costs in 2+ franchises",type:"Main",due:"Q4 FY27",owner:"Alessandro",p:0,s:""},
+  {bu:"LOCALIZATION",obj:"Quality",m:"PSAT 4.7/5 in quality sections; 99% First Time Pass Rate",type:"Main",due:"Q4 FY27",owner:"Alessandro",p:0,s:""},
+  {bu:"LOCALIZATION",obj:"World Class Partnership",m:"EA Loc is partner of choice — PSAT 4.7/5",type:"Main",due:"Q4 FY27",owner:"Alessandro",p:0,s:""},
+  {bu:"LOCALIZATION",obj:"World Class Partnership",m:"Culturalization pilots demonstrably improving engagement and revenue",type:"Main",due:"Q4 FY27",owner:"Alessandro",p:0,s:""},
+  {bu:"LOCALIZATION",obj:"Create the Workforce of the Future",m:"5% involuntary attrition (managed out + non-regrettable losses)",type:"Main",due:"Q4 FY27",owner:"Alessandro",p:0,s:""},
+  {bu:"LOCALIZATION",obj:"Create the Workforce of the Future",m:"All JDs revamped to include AI skills; structured learning paths completed",type:"Main",due:"Q4 FY27",owner:"Alessandro",p:0,s:""},
+  {bu:"CENTRAL OPS",obj:"Strategic Focus",m:"QVS: Achieve FY27 cost savings commitment of $20M",type:"Main",due:"Q4 FY27",owner:"Lorena",p:0,s:""},
+  {bu:"CENTRAL OPS",obj:"World Class Partnership",m:"Implement Quality Partnership Score (QPS) across QVS",type:"Main",due:"Q4 FY27",owner:"Lorena",p:0,s:""},
+  {bu:"CENTRAL OPS",obj:"World Class Partnership",m:"Fully Automated Orbit Executive Reporting",type:"Main",due:"Q4 FY27",owner:"Jorge",p:0,s:""},
+  {bu:"CENTRAL OPS",obj:"World Class Partnership",m:"On-Demand AI-powered Retrospective Portal",type:"Main",due:"Q4 FY27",owner:"Jorge",p:0,s:""},
+  {bu:"CENTRAL OPS",obj:"World Class Partnership",m:"XDI BU QBR with BF and Sports Ops — managed risk, cost, delivery resilience",type:"Main",due:"Q3 FY27",owner:"Mali",p:0,s:""},
+  {bu:"CENTRAL OPS",obj:"Create the Workforce of the Future",m:"QVS: People Leaders have documented FY27 Leadership goal in Workday by 07/31/26",type:"Main",due:"Q2 FY27",owner:"Lorena",p:0,s:""},
+  {bu:"CENTRAL OPS",obj:"Create the Workforce of the Future",m:"QVS: Deliver People Leader training with measurable adoption by Q3",type:"Main",due:"Q3 FY27",owner:"Lorena",p:0,s:""},
+  {bu:"CENTRAL OPS",obj:"Create the Workforce of the Future",m:"QVS: Romania workforce under 400 NEW; Bogotá: $10M FY27 contribution",type:"Main",due:"Q4 FY27",owner:"Lorena",p:0,s:""},
+  {bu:"ALL",obj:"Create the Workforce of the Future",m:"Drive Organization Effectiveness — performance management to 5.0%; SPOC 6.2",type:"Main",due:"Q4 FY27",owner:"All",p:0,s:""},
+  {bu:"ALL",obj:"Create the Workforce of the Future",m:"AI Readiness — 3 roles/job descriptions transformed with AI responsibilities",type:"Main",due:"Q4 FY27",owner:"All",p:0,s:""},
+  {bu:"ALL",obj:"Create the Workforce of the Future",m:"Strengthen People Leader Effectiveness — each leader has one FY27 leadership goal",type:"Main",due:"Q4 FY27",owner:"All",p:0,s:""},
+];
+
+G.forEach((g,i)=>g.id=g.id||'goal-'+i);
+let nextGoalId = G.length;
+let editingGoalId = null;
+let openCard = null;
+const years = ['FY27'];
+let activeYear = 'FY27';
+
+function scls(s){
+  if(!s)return'pill-blank';
+  const l=s.toLowerCase();
+  if(l.includes('track'))return'pill-ontrack';
+  if(l.includes('risk'))return'pill-atrisk';
+  if(l.includes('complet'))return'pill-completed';
+  if(l.includes('miss'))return'pill-missed';
+  if(l.includes('defer'))return'pill-deferred';
+  if(l.includes('cancel'))return'pill-blank';
+  return'pill-blank';
+}
+
+function slbl(s){return s||'Not started'}
+
+function qcls(due){
+  if(!due)return'';
+  if(due.includes('Q1'))return'q1';
+  if(due.includes('Q2'))return'q2';
+  if(due.includes('Q3'))return'q3';
+  if(due.includes('Q4'))return'q4';
+  return'';
+}
+
+function pcolor(p){
+  if(p===0)return'#333';
+  if(p<0.4)return'#fbbf24';
+  if(p<0.75)return'#60a5fa';
+  return'#4ade80';
+}
+
+function renderStats(){
+  const total=G.length;
+  const main=G.filter(g=>g.type==='Main').length;
+  const stretch=G.filter(g=>g.type==='Stretch').length;
+  const wp=G.filter(g=>g.p>0);
+  const avg=wp.length?Math.round(wp.reduce((a,g)=>a+g.p,0)/wp.length*100):0;
+  document.getElementById('statsGrid').innerHTML=`
+    <div class="stat"><div class="stat-val">${total}</div><div class="stat-lbl">Total goals</div></div>
+    <div class="stat"><div class="stat-val green">${main}</div><div class="stat-lbl">Main goals</div></div>
+    <div class="stat"><div class="stat-val amber">${stretch}</div><div class="stat-lbl">Stretch goals</div></div>
+    <div class="stat"><div class="stat-val blue">${avg}%</div><div class="stat-lbl">Avg progress</div></div>
+  `;
+  document.getElementById('dashSub').textContent=`${activeYear} · ${total} goals`;
+}
+
+function populateFilters(){
+  const bus=[...new Set(G.map(g=>g.bu))].sort();
+  const objs=[...new Set(G.map(g=>g.obj))].sort();
+  document.getElementById('fBU').innerHTML='<option value="">All BUs</option>'+bus.map(b=>`<option>${b}</option>`).join('');
+  document.getElementById('fObj').innerHTML='<option value="">All objectives</option>'+objs.map(o=>`<option>${o}</option>`).join('');
+  const buList=document.getElementById('buList'); if(buList) buList.innerHTML=bus.map(b=>`<option value="${b}"></option>`).join('');
+  const objList=document.getElementById('objList'); if(objList) objList.innerHTML=objs.map(o=>`<option value="${o}"></option>`).join('');
+}
+
+function render(){
+  const bu=document.getElementById('fBU').value;
+  const obj=document.getElementById('fObj').value;
+  const type=document.getElementById('fType').value;
+  const q=document.getElementById('fQ').value;
+  const filtered=G.filter(g=>{
+    if(bu&&g.bu!==bu)return false;
+    if(obj&&g.obj!==obj)return false;
+    if(type&&g.type!==type)return false;
+    if(q&&(!g.due||!g.due.includes(q)))return false;
+    return true;
+  });
+  document.getElementById('resultCount').textContent=`${filtered.length} goal${filtered.length!==1?'s':''}`;
+  const grouped={};
+  filtered.forEach(g=>{if(!grouped[g.obj])grouped[g.obj]=[];grouped[g.obj].push(g);});
+  const pane=document.getElementById('goalsPane');
+  if(!filtered.length){pane.innerHTML='<div class="empty">No goals match these filters.</div>';return;}
+  pane.innerHTML=Object.entries(grouped).map(([obj,goals])=>`
+    <div class="goal-group">
+      <div class="group-label">${obj} <span style="color:#333;margin-left:6px">${goals.length}</span></div>
+      ${goals.map(g=>cardHTML(g,g.id)).join('')}
+    </div>
+  `).join('');
+}
+
+function cardHTML(g,uid){
+  const pct=Math.round(g.p*100);
+  return`<div class="goal-card" id="card-${uid}" onclick="toggle('${uid}')">
+    <div class="gc-top">
+      <div class="gc-text">${g.m}</div>
+      <div class="card-actions"><span class="pill ${scls(g.s)}">${slbl(g.s)}</span><button class="icon-btn" onclick="event.stopPropagation();editGoal('${uid}')">Edit</button></div>
+    </div>
+    <div class="gc-meta">
+      <span class="tag bu">${g.bu}</span>
+      <span class="tag ${g.type==='Stretch'?'stretch':'main'}">${g.type}</span>
+      ${g.due?`<span class="tag ${qcls(g.due)}">${g.due}</span>`:''}
+    </div>
+    <div class="prog-row">
+      <div class="prog-track"><div class="prog-fill" style="width:${pct}%;background:${pcolor(g.p)}" id="fill-${uid}"></div></div>
+      <span class="prog-pct" id="pct-${uid}">${pct}%</span>
+    </div>
+    <div class="gc-expand">
+      <div class="expand-row">
+        <span class="expand-lbl">Progress</span>
+        <input type="range" min="0" max="100" value="${pct}" step="5"
+          oninput="updP('${uid}',this.value)" onclick="event.stopPropagation()">
+        <span class="expand-pct" id="epct-${uid}">${pct}%</span>
+      </div>
+      <div class="expand-row">
+        <span class="expand-lbl">Status</span>
+        <select onclick="event.stopPropagation()" onchange="updS('${uid}',this.value)">
+          <option value="">Not started</option>
+          <option value="On Track" ${g.s==='On Track'?'selected':''}>On Track</option>
+          <option value="At Risk" ${g.s==='At Risk'?'selected':''}>At Risk</option>
+          <option value="Completed" ${g.s==='Completed'?'selected':''}>Completed</option>
+          <option value="Deferred" ${g.s==='Deferred'?'selected':''}>Deferred</option>
+          <option value="Missed" ${g.s==='Missed'?'selected':''}>Missed</option>
+          <option value="Cancelled" ${g.s==='Cancelled'?'selected':''}>Cancelled</option>
+        </select>
+      </div>
+      ${g.owner?`<div class="owner-info"><span><i class="ti ti-user" style="font-size:13px;vertical-align:-1px;margin-right:4px" aria-hidden="true"></i>${g.owner}</span></div>`:''}
+    </div>
+  </div>`;
+}
+
+function toggle(uid){
+  const el=document.getElementById('card-'+uid);
+  if(!el)return;
+  if(openCard&&openCard!==uid){
+    const prev=document.getElementById('card-'+openCard);
+    if(prev)prev.classList.remove('open');
+  }
+  el.classList.toggle('open');
+  openCard=el.classList.contains('open')?uid:null;
+}
+
+function updP(uid,val){
+  const goal=G.find(g=>g.id===uid);
+  const v=parseInt(val);
+  if(goal)goal.p=v/100;
+  const fill=document.getElementById('fill-'+uid);
+  const pct=document.getElementById('pct-'+uid);
+  const epct=document.getElementById('epct-'+uid);
+  const color=pcolor(v/100);
+  if(fill){fill.style.width=v+'%';fill.style.background=color;}
+  if(pct)pct.textContent=v+'%';
+  if(epct)epct.textContent=v+'%';
+  renderStats();
+}
+
+function updS(uid,val){
+  const goal=G.find(g=>g.id===uid);
+  if(goal)goal.s=val;
+  const card=document.getElementById('card-'+uid);
+  if(!card)return;
+  const pill=card.querySelector('.pill');
+  if(pill){pill.className='pill '+scls(val);pill.textContent=slbl(val);}
+}
+
+function showTab(tab,btn){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  document.getElementById('pane-goals').style.display=tab==='goals'?'block':'none';
+  document.getElementById('pane-manage').style.display=tab==='manage'?'block':'none';
+  document.getElementById('pane-upload').style.display=tab==='upload'?'block':'none';
+}
+
+function setForm(goal){
+  editingGoalId=goal?goal.id:null;
+  document.getElementById('goalFormTitle').textContent=goal?'Edit Goal':'Add Goal';
+  document.getElementById('goalId').value=goal?goal.id:'';
+  document.getElementById('goalBU').value=goal?goal.bu:'';
+  document.getElementById('goalObj').value=goal?goal.obj:'';
+  document.getElementById('goalM').value=goal?goal.m:'';
+  document.getElementById('goalType').value=goal?goal.type:'Main';
+  document.getElementById('goalDue').value=goal?goal.due:'Q4 FY27';
+  document.getElementById('goalOwner').value=goal?goal.owner:'';
+  document.getElementById('goalProgress').value=goal?Math.round(goal.p*100):0;
+  document.getElementById('goalStatus').value=goal?goal.s:'';
+  document.getElementById('deleteGoalBtn').style.display=goal?'inline-block':'none';
+  document.getElementById('formMsg').textContent=goal?'Update goal details, then save.':'New goals are added to the current dashboard session.';
+}
+
+function startAddGoal(){ setForm(null); }
+
+function editGoal(id){
+  const goal=G.find(g=>g.id===id);
+  if(!goal)return;
+  const btns=document.querySelectorAll('.tab-btn');
+  showTab('manage',btns[1]);
+  setForm(goal);
+}
+
+function clearGoalForm(){ setForm(null); }
+
+function saveGoal(e){
+  e.preventDefault();
+  const id=document.getElementById('goalId').value;
+  const data={
+    id:id||'goal-'+(nextGoalId++),
+    bu:document.getElementById('goalBU').value.trim(),
+    obj:document.getElementById('goalObj').value.trim(),
+    m:document.getElementById('goalM').value.trim(),
+    type:document.getElementById('goalType').value,
+    due:document.getElementById('goalDue').value,
+    owner:document.getElementById('goalOwner').value.trim(),
+    p:Math.max(0,Math.min(100,parseInt(document.getElementById('goalProgress').value||0)))/100,
+    s:document.getElementById('goalStatus').value
+  };
+  if(!data.bu||!data.obj||!data.m)return;
+  const idx=G.findIndex(g=>g.id===id);
+  if(idx>=0)G[idx]=data; else G.unshift(data);
+  populateFilters(); renderStats(); render(); setForm(data);
+  document.getElementById('formMsg').textContent='Saved. Return to Goals to view it, or continue editing.';
+}
+
+function deleteGoal(){
+  const id=document.getElementById('goalId').value;
+  if(!id)return;
+  const idx=G.findIndex(g=>g.id===id);
+  if(idx>=0)G.splice(idx,1);
+  populateFilters(); renderStats(); render(); setForm(null);
+  document.getElementById('formMsg').textContent='Goal deleted.';
+}
+
+function handleFile(e){
+  const f=e.target.files[0];
+  if(!f)return;
+  const match=f.name.match(/FY(\d+)/i);
+  const yr=match?`FY${match[1]}`:`FY${new Date().getFullYear()+1}`;
+  if(!years.includes(yr))years.push(yr);
+  document.getElementById('uploadMsg').textContent=`Uploaded as ${yr}`;
+  document.getElementById('uploadedList').textContent='Years: '+years.join(', ');
+}
+
+renderStats();
+populateFilters();
+render();
+</script>
